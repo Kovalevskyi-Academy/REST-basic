@@ -23,8 +23,7 @@ public class LinkResourceTest {
     @Before
     public void setUp() throws Exception {
         server = Main.startServer();
-        Client c = ClientBuilder.newClient();
-
+        final Client c = ClientBuilder.newClient();
         target = c.target(Main.BASE_URI);
     }
 

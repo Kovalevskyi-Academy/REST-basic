@@ -3,11 +3,10 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.example.rest</groupId>
-    <artifactId>jersey-service</artifactId>
+    <groupId>io.hexlet.java</groupId>
+    <artifactId>jxr-rs</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>jersey-service</name>
 
     <dependencyManagement>
         <dependencies>

@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
+// my.site.com/api/links
 @Path("links")
 public class LinkResource {
 
@@ -18,7 +18,7 @@ public class LinkResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("{id}")
-    public Response getUrlById(final String id) {
+    public Response getUrlById(final @PathParam("id") String id) {
         if (id == null || id.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -32,9 +32,9 @@ public class LinkResource {
     @PUT
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response shortUrl(final String requestDoc) {
+    public Response shortUrl(final String url) {
         final int id = currentId.getAndIncrement();
-        links.put(String.valueOf(id), requestDoc.toString());
+        links.put(String.valueOf(id), url);
         return Response.ok(id).build();
     }
 }
