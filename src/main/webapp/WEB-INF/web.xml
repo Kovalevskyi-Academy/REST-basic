@@ -1,0 +1,4 @@
+<servlet-mapping>
+    <servlet-name>io.hexlet.java.links.RestApplication</servlet-name>
+    <url-pattern>/*</url-pattern>
+</servlet-mapping>
