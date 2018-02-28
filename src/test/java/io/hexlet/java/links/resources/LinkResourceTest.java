@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 
 public class LinkResourceTest {
 
-    public static final String BASE_URI = "http://localhost:8080/";
+    public static final String BASE_URI = "http://localhost:8081/";
 
     private HttpServer server;
     private WebTarget target;
@@ -39,7 +39,7 @@ public class LinkResourceTest {
 
     @Test
     public void testUrlCreation() {
-        final String url = "url";
+        final String url = "http://google.com";
         final String id = target
                 .path("links")
                 .request()

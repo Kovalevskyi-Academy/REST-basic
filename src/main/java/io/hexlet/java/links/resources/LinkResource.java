@@ -1,28 +1,29 @@
 package io.hexlet.java.links.resources;
 
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoWriteException;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import org.bson.Document;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.spec.PutItemSpec;
+import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-import java.util.Iterator;
 import java.util.Random;
 
 // my.site.com/api/links
 @Path("links")
 public class LinkResource {
 
-    private static final MongoCollection<Document> LINKS_COLLECTION;
+    private static final Table LINKS_TABLE;
 
     static {
-        final MongoClient mongo = new MongoClient( "localhost" , 27017 );
-        final MongoDatabase db = mongo.getDatabase("hexlet");
-        LINKS_COLLECTION = db.getCollection("links");
+        final AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
+        final DynamoDB dynamoDB = new DynamoDB(client);
+
+        LINKS_TABLE = dynamoDB.getTable("links");
     }
 
     @GET
@@ -32,13 +33,8 @@ public class LinkResource {
         if (id == null || id.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        final FindIterable<Document> resultsIterable
-                = LINKS_COLLECTION.find(new Document("id", id));
-        final Iterator<Document> resultIterator = resultsIterable.iterator();
-        if (!resultIterator.hasNext()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-        final String url = resultIterator.next().getString("url");
+        final Item item = LINKS_TABLE.getItem("id", id);
+        final String url = item.getString("url");
         if (url == null || url == "") {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -52,12 +48,15 @@ public class LinkResource {
         int attempt = 0;
         while (attempt < 5) {
             final String id = getRandomId();
-            final Document newShortDoc = new Document("id", id);
-            newShortDoc.put("url", url);
+            final Item urlRecord = new Item()
+                    .withPrimaryKey("id", id).withString("url", url);
             try {
-                LINKS_COLLECTION.insertOne(newShortDoc);
+                LINKS_TABLE.putItem(
+                        new PutItemSpec()
+                                .withConditionExpression("attribute_not_exists(id)")
+                                .withItem(urlRecord));
                 return Response.ok(id).build();
-            } catch (MongoWriteException e) {
+            } catch (ConditionalCheckFailedException e) {
                 // attempt to write failed, ID - exists.
             }
             attempt++;
