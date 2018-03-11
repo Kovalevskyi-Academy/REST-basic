@@ -23,7 +23,7 @@ public class LinkResource {
         final AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
         final DynamoDB dynamoDB = new DynamoDB(client);
 
-        LINKS_TABLE = dynamoDB.getTable("links");
+        LINKS_TABLE = dynamoDB.getTable("Links");
     }
 
     @GET
@@ -49,7 +49,8 @@ public class LinkResource {
         while (attempt < 5) {
             final String id = getRandomId();
             final Item urlRecord = new Item()
-                    .withPrimaryKey("id", id).withString("url", url);
+                    .withPrimaryKey("id", id)
+                    .withString("url", url);
             try {
                 LINKS_TABLE.putItem(
                         new PutItemSpec()
